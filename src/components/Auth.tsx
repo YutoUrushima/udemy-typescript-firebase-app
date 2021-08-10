@@ -18,7 +18,7 @@ import {
   Box,
 } from "@material-ui/core";
 
-import sendIcon from "@material-ui/icons/send";
+import SendIcon from "@material-ui/icons/Send";
 import CameraIcon from "@material-ui/icons/Camera";
 import EmailIcon from "@material-ui/icons/Email";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
@@ -63,7 +63,7 @@ const Auth: React.FC = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userName, setUserName] = useState("");
+  const [username, setUsername] = useState("");
   const [avatarImage, setAvatarImage] = useState<File | null>(null);
   const [isLogin, setIsLogin] = useState(true);
 
@@ -93,12 +93,12 @@ const Auth: React.FC = () => {
       url = await storage.ref("avatars").child(fileName).getDownloadURL();
     }
     await authUser.user?.updateProfile({
-      displayName: userName,
+      displayName: username,
       photoURL: url,
     });
     dispatch(
       updateUserProfile({
-        displayName: userName,
+        displayName: username,
         photoUrl: url,
       })
     );
@@ -121,6 +121,45 @@ const Auth: React.FC = () => {
             {isLogin ? "Login" : "Register"}
           </Typography>
           <form className={classes.form} noValidate>
+            {!isLogin && (
+              <>
+                <TextField
+                  variant="outlined"
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="username"
+                  label="Username"
+                  name="username"
+                  autoComplete="username"
+                  autoFocus
+                  value={username}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setUsername(e.target.value);
+                  }}
+                />
+                <Box textAlign="center">
+                  <IconButton>
+                    <label>
+                      <AccountCircleIcon
+                        fontSize="large"
+                        className={
+                          avatarImage
+                            ? styles.login_addIconLoaded
+                            : styles.login_addIcon
+                        }
+                      />
+                      <input
+                        className={styles.login_hiddenIcon}
+                        type="file"
+                        onChange={onChangeImageHandler}
+                      />
+                    </label>
+                  </IconButton>
+                </Box>
+              </>
+            )}
+
             <TextField
               variant="outlined"
               margin="normal"
@@ -152,6 +191,11 @@ const Auth: React.FC = () => {
               }}
             />
             <Button
+              disabled={
+                isLogin
+                  ? !email || password.length < 6
+                  : !username || !email || password.length < 6 || !avatarImage
+              }
               fullWidth
               variant="contained"
               color="primary"
@@ -186,7 +230,7 @@ const Auth: React.FC = () => {
                   className={styles.login_toggleMode}
                   onClick={() => setIsLogin(!isLogin)}
                 >
-                  {isLogin ? "Create new account ?" : "Back to Login"}
+                  {isLogin ? "Create new account ?" : "Back to login"}
                 </span>
               </Grid>
             </Grid>
@@ -197,7 +241,7 @@ const Auth: React.FC = () => {
               className={classes.submit}
               onClick={signInGoogle}
             >
-              Sign In With Google
+              SignIn with Google
             </Button>
           </form>
         </div>
